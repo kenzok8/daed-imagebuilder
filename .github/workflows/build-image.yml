@@ -61,7 +61,8 @@ jobs:
             file \
             wget \
             curl \
-            qemu-utils
+            qemu-utils \
+            genisoimage
 
       - name: Build image
         env:
