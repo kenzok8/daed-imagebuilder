@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION="${VERSION:-SNAPSHOT}"
+VERSION="${VERSION:-25.12-SNAPSHOT}"
 TARGET="${TARGET:-x86/64}"
 PROFILE="${PROFILE:-generic}"
-IMAGEBUILDER_URL="${IMAGEBUILDER_URL:-https://downloads.immortalwrt.org/snapshots/targets/x86/64/immortalwrt-imagebuilder-x86-64.Linux-x86_64.tar.zst}"
+IMAGEBUILDER_URL="${IMAGEBUILDER_URL:-https://downloads.immortalwrt.org/releases/25.12-SNAPSHOT/targets/x86/64/immortalwrt-imagebuilder-25.12-SNAPSHOT-x86-64.Linux-x86_64.tar.zst}"
 EXTRA_IMAGE_NAME="${EXTRA_IMAGE_NAME:-daed-deps}"
 OUT_DIR="${OUT_DIR:-$PWD/out}"
+PREFLIGHT="${PREFLIGHT:-1}"
 
 EXTRA_PACKAGES="${EXTRA_PACKAGES:-luci kmod-sched-core kmod-sched-bpf kmod-veth kmod-xdp-sockets-diag vmlinux-btf v2ray-geoip v2ray-geosite}"
 
@@ -33,11 +34,40 @@ echo "Target: $TARGET"
 echo "Profile: $PROFILE"
 echo "Extra packages: $EXTRA_PACKAGES"
 
-make image \
-  PROFILE="$PROFILE" \
-  PACKAGES="$EXTRA_PACKAGES" \
-  FILES=files \
-  BIN_DIR="$OUT_DIR" \
-  EXTRA_IMAGE_NAME="$EXTRA_IMAGE_NAME"
+diagnose_failure() {
+  cat >&2 <<'EOF'
+
+ImageBuilder failed.
+
+Common causes for this daed test image:
+- The selected ImmortalWrt snapshot ImageBuilder and package feeds are out of sync.
+  Example: base packages require a newer libubox/libblobmsg-json than the public feed provides.
+- vmlinux-btf is not published for the selected target/feed. ImageBuilder can only install
+  packages that already exist in the feed; it cannot build vmlinux-btf by itself.
+
+Next choices:
+- Retry later with the same 25.12-SNAPSHOT URL after ImmortalWrt feeds finish syncing.
+- Use a release/rc ImageBuilder URL and build dae/daed APKs against the same release/rc.
+- Rebuild dae/daed with BPF_DEPENDS instead of vmlinux-btf if that target does not publish vmlinux-btf.
+EOF
+}
+
+if [ "$PREFLIGHT" = "1" ] || [ "$PREFLIGHT" = "true" ]; then
+  echo "Running package manifest preflight..."
+  if ! make manifest PROFILE="$PROFILE" PACKAGES="$EXTRA_PACKAGES"; then
+    diagnose_failure
+    exit 1
+  fi
+fi
+
+if ! make image \
+    PROFILE="$PROFILE" \
+    PACKAGES="$EXTRA_PACKAGES" \
+    FILES=files \
+    BIN_DIR="$OUT_DIR" \
+    EXTRA_IMAGE_NAME="$EXTRA_IMAGE_NAME"; then
+  diagnose_failure
+  exit 1
+fi
 
 find "$OUT_DIR" -maxdepth 1 -type f -print

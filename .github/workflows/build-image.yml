@@ -18,7 +18,15 @@ on:
       imagebuilder_url:
         description: ImmortalWrt ImageBuilder URL
         required: true
-        default: "https://downloads.immortalwrt.org/snapshots/targets/x86/64/immortalwrt-imagebuilder-x86-64.Linux-x86_64.tar.zst"
+        default: "https://downloads.immortalwrt.org/releases/25.12-SNAPSHOT/targets/x86/64/immortalwrt-imagebuilder-25.12-SNAPSHOT-x86-64.Linux-x86_64.tar.zst"
+      preflight:
+        description: Run package manifest preflight before building the image
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
 
 permissions:
   contents: write
@@ -58,6 +66,7 @@ jobs:
         env:
           IMAGEBUILDER_URL: ${{ inputs.imagebuilder_url }}
           EXTRA_PACKAGES: ${{ inputs.extra_packages }}
+          PREFLIGHT: ${{ inputs.preflight }}
           OUT_DIR: ${{ github.workspace }}/out
         run: |
           chmod +x scripts/build-image.sh

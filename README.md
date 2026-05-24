@@ -16,11 +16,11 @@ feed packages.
 
 ## Default Image
 
-- Version: ImmortalWrt `SNAPSHOT`
+- Version: ImmortalWrt `25.12-SNAPSHOT`
 - Target: `x86/64`
 - Profile: `generic`
 - ImageBuilder URL:
-  `https://downloads.immortalwrt.org/snapshots/targets/x86/64/immortalwrt-imagebuilder-x86-64.Linux-x86_64.tar.zst`
+  `https://downloads.immortalwrt.org/releases/25.12-SNAPSHOT/targets/x86/64/immortalwrt-imagebuilder-25.12-SNAPSHOT-x86-64.Linux-x86_64.tar.zst`
 
 ## Extra Packages
 
@@ -37,9 +37,24 @@ v2ray-geoip
 v2ray-geosite
 ```
 
-If the current ImmortalWrt snapshot does not publish one of these packages,
-the build should fail. That is intentional because `dae/daed` will not be
-installable cleanly on that snapshot either.
+If the selected ImmortalWrt feed does not publish one of these packages, the
+build should fail. That is intentional because `dae/daed` will not be
+installable cleanly on that image either.
+
+The workflow runs `make manifest` before building the image. This catches common
+feed problems earlier, especially:
+
+- snapshot ImageBuilder and package feeds are out of sync
+- `vmlinux-btf` is not published for the selected target/feed
+
+ImageBuilder can only install packages that already exist in the feed. It cannot
+build `vmlinux-btf` or kernel modules by itself. If `vmlinux-btf` is missing,
+use one of these paths:
+
+- retry later after ImmortalWrt snapshot feeds finish syncing
+- switch `imagebuilder_url` to a release/rc ImageBuilder and build `dae/daed`
+  APKs against the same release/rc
+- rebuild `dae/daed` with BPF_DEPENDS instead of the `vmlinux-btf` dependency
 
 ## First Boot Defaults
 
