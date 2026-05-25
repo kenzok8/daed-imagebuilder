@@ -35,6 +35,8 @@ echo "Target: $TARGET"
 echo "Profile: $PROFILE"
 echo "Rootfs part size: ${ROOTFS_PARTSIZE}MB"
 echo "Extra packages: $EXTRA_PACKAGES"
+mkdir -p "$OUT_DIR"
+echo "extra_packages=$EXTRA_PACKAGES" > "$OUT_DIR/.extra_packages"
 
 diagnose_failure() {
   cat >&2 <<'EOF'

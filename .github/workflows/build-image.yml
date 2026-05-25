@@ -11,10 +11,6 @@ on:
         options:
           - "false"
           - "true"
-      extra_packages:
-        description: Extra packages to install into the base image
-        required: true
-        default: "luci kmod-sched-core kmod-sched-bpf kmod-veth kmod-xdp-sockets-diag curl nano"
       imagebuilder_url:
         description: ImmortalWrt ImageBuilder URL
         required: true
@@ -71,7 +67,6 @@ jobs:
       - name: Build image
         env:
           IMAGEBUILDER_URL: ${{ inputs.imagebuilder_url }}
-          EXTRA_PACKAGES: ${{ inputs.extra_packages }}
           PREFLIGHT: ${{ inputs.preflight }}
           ROOTFS_PARTSIZE: ${{ inputs.rootfs_partsize }}
           OUT_DIR: ${{ github.workspace }}/out
@@ -84,7 +79,7 @@ jobs:
           {
             echo "date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
             echo "imagebuilder_url=${{ inputs.imagebuilder_url }}"
-            echo "extra_packages=${{ inputs.extra_packages }}"
+            cat "${{ github.workspace }}/out/.extra_packages" 2>/dev/null || true
             echo
             sha256sum out/* || true
           } > out/BUILD-MANIFEST.txt
