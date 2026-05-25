@@ -19,6 +19,7 @@ feed packages.
 - Version: ImmortalWrt `25.12-SNAPSHOT`
 - Target: `x86/64`
 - Profile: `generic`
+- Rootfs partition: `2048` MB
 - ImageBuilder URL:
   `https://downloads.immortalwrt.org/releases/25.12-SNAPSHOT/targets/x86/64/immortalwrt-imagebuilder-25.12-SNAPSHOT-x86-64.Linux-x86_64.tar.zst`
 
@@ -64,7 +65,10 @@ The generated image applies these defaults on first boot:
 - Gateway: `192.168.3.254`
 - DNS: `192.168.3.254`, `223.5.5.5`
 - SSH port: `9167`
-- root password: `123456`
+
+No root password is written into this repository or the generated image. Set a
+password from the VM console after first boot, or inject an SSH public key using
+a private workflow/secret-based step.
 
 ## Build
 

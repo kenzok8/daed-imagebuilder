@@ -27,6 +27,10 @@ on:
         options:
           - "true"
           - "false"
+      rootfs_partsize:
+        description: Root filesystem partition size in MB
+        required: true
+        default: "2048"
 
 permissions:
   contents: write
@@ -69,6 +73,7 @@ jobs:
           IMAGEBUILDER_URL: ${{ inputs.imagebuilder_url }}
           EXTRA_PACKAGES: ${{ inputs.extra_packages }}
           PREFLIGHT: ${{ inputs.preflight }}
+          ROOTFS_PARTSIZE: ${{ inputs.rootfs_partsize }}
           OUT_DIR: ${{ github.workspace }}/out
         run: |
           chmod +x scripts/build-image.sh

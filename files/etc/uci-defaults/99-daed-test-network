@@ -16,8 +16,6 @@ uci set dropbear.main.Port='9167'
 uci set dropbear.main.Interface='lan'
 uci commit dropbear
 
-printf '%s\n%s\n' '123456..' '123456..' | passwd root
-
 /etc/init.d/network restart
 /etc/init.d/dropbear restart
 

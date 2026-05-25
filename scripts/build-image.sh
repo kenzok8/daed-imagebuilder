@@ -8,6 +8,7 @@ IMAGEBUILDER_URL="${IMAGEBUILDER_URL:-https://downloads.immortalwrt.org/releases
 EXTRA_IMAGE_NAME="${EXTRA_IMAGE_NAME:-daed-deps}"
 OUT_DIR="${OUT_DIR:-$PWD/out}"
 PREFLIGHT="${PREFLIGHT:-1}"
+ROOTFS_PARTSIZE="${ROOTFS_PARTSIZE:-2048}"
 
 EXTRA_PACKAGES="${EXTRA_PACKAGES:-luci kmod-sched-core kmod-sched-bpf kmod-veth kmod-xdp-sockets-diag vmlinux-btf v2ray-geoip v2ray-geosite}"
 
@@ -32,6 +33,7 @@ cd "$WORK_DIR/imagebuilder"
 echo "Version: $VERSION"
 echo "Target: $TARGET"
 echo "Profile: $PROFILE"
+echo "Rootfs part size: ${ROOTFS_PARTSIZE}MB"
 echo "Extra packages: $EXTRA_PACKAGES"
 
 diagnose_failure() {
@@ -65,7 +67,8 @@ if ! make image \
     PACKAGES="$EXTRA_PACKAGES" \
     FILES=files \
     BIN_DIR="$OUT_DIR" \
-    EXTRA_IMAGE_NAME="$EXTRA_IMAGE_NAME"; then
+    EXTRA_IMAGE_NAME="$EXTRA_IMAGE_NAME" \
+    ROOTFS_PARTSIZE="$ROOTFS_PARTSIZE"; then
   diagnose_failure
   exit 1
 fi
