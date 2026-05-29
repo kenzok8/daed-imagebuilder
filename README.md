@@ -32,9 +32,8 @@ kmod-sched-core
 kmod-sched-bpf
 kmod-veth
 kmod-xdp-sockets-diag
-vmlinux-btf
-v2ray-geoip
-v2ray-geosite
+curl
+nano
 ```
 
 If the selected ImmortalWrt feed does not publish one of these packages, the
